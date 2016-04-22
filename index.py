@@ -1,14 +1,1 @@
-import sys
-
-def application(environ, start_response):
-    output = 'Welcome to your mod_wsgi website, yay! It uses:\n\nPython %s' % sys.version
-    output += '\nWSGI version: %s' % str(environ['mod_wsgi.version'])
-
-    response_headers = [
-        ('Content-Length', str(len(output))),
-        ('Content-Type', 'text/plain'),
-    ]
-
-    start_response('200 OK', response_headers)
-
-    return [bytes(output, 'utf-8')]
+from application import app as application
