@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd webapp/poema/htdocs
+cd webapps/poema/htdocs/
 git pull --ff
