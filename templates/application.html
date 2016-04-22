@@ -50,6 +50,10 @@
           <form action="" method="POST" enctype="multipart/form-data">
             <fieldset id="image-fieldset">
               <legend>Imagem</legend>
+              <div class="col-md-12">
+              <input type="checkbox" id="process_image" name="process_image" {% if process_image %}checked{% endif %}>
+                <label for="process_image">Processar imagem?</label>
+              </div>
               <div class="col-md-4">
                 <label for="file">Selecione o arquivo para imagem de fundo...</label>
                 <input type="file" name="file" id="file" />
@@ -72,6 +76,14 @@
                 <p>Título</p>
                 <textarea name="title" id="title" rows="3" cols="50">{{ title }}</textarea>
                 <div>
+                  <label for="font_family">Família da fonte</label>
+                  <select id="font_family" name="font_family">
+                  {% for i, font in font_families %}
+                    <option value="{{ i }}" {% if i == font_family %}selected{% endif %}>{{ font }}</option>
+                  {% endfor %}
+                  </select>
+                </div>
+                <div>
                   <label for="font_size">Tamanho da fonte</label>
                   <input type="number" inputmode="numeric" name="font_size" id="font_size" value="{{ font_size }}" />
                 </div>
@@ -90,6 +102,14 @@
               <div class="col-md-6">
                 <p>Overlay</p>
                 <textarea name="overlay_title" id="overlay_title" rows="3" cols="50">{{ overlay_title }}</textarea>
+                <div>
+                  <label for="overlay_font_family">Família da fonte</label>
+                  <select id="overlay_font_family" name="overlay_font_family">
+                  {% for i, font in font_families %}
+                    <option value="{{ i }}" {% if i == overlay_font_family %}selected{% endif %}>{{ font }}</option>
+                  {% endfor %}
+                  </select>
+                </div>
                 <div>
                   <label for="overlay_font_size">Tamanho da fonte</label>
                   <input type="number" inputmode="numeric" name="overlay_font_size" id="overlay_font_size" value="{{ overlay_font_size }}" />

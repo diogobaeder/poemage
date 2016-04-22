@@ -16,29 +16,64 @@ app = Flask(__name__)
 
 
 MASK = join(app.root_path, 'static', 'img', 'mask.png')
-FONTS = join(app.root_path, 'static', 'fonts')
+FONTS_PATH = join(app.root_path, 'static', 'fonts')
+WHITE = '#ffffff'
+BLACK = '#000000'
 DEFAULT_FONT_SIZE = 36
 DEFAULT_TEXT_X = 250
 DEFAULT_TEXT_Y = 530
+DEFAULT_OVERLAY_TEXT_X = 340
+DEFAULT_OVERLAY_TEXT_Y = 20
+
+
+FONTS = {
+    i: font for i, font in enumerate(os.listdir(FONTS_PATH))
+    if font.lower().endswith('ttf')
+    and 'glyph' not in font.lower()
+}
+FONTS_IDS = {
+    font: i for i, font in FONTS.items()
+}
+DEFAULT_FONT = 'Impact.ttf'
+DEFAULT_FONT_ID = FONTS_IDS[DEFAULT_FONT]
+
+
+def font_path(font_id):
+    font = FONTS[font_id]
+    return join(FONTS_PATH, font)
 
 
 def generate(original_photo, context):
     mask = Image.open(MASK)
     photo = ImageOps.fit(original_photo, mask.size)
     mask = mask.convert('RGBA')
-    photo = photo.convert('L')
-    #photo = ImageOps.equalize(photo)
-    photo = ImageOps.colorize(photo, context['black'], context['white'])
     photo = photo.convert('RGBA')
+
+    if context['process_image']:
+        photo = photo.convert('L')
+        photo = ImageOps.equalize(photo)
+        photo = ImageOps.colorize(photo, context['black'], context['white'])
+        photo = photo.convert('RGBA')
 
     composition = Image.alpha_composite(photo, mask)
 
-    font_path = join(FONTS, 'SourceSansPro-Bold.ttf')
-    text_coords = (context['text_x'], context['text_y'])
-    font = ImageFont.truetype(font_path, context['font_size'])
+
     draw = ImageDraw.Draw(composition)
+
+    main_font = ImageFont.truetype(
+        font_path(context['font_family']), context['font_size'])
     draw.multiline_text(
-        text_coords, context['title'], context['font_color'], font)
+        (context['text_x'], context['text_y']),
+        context['title'], context['font_color'], main_font)
+
+    if context['overlay_title']:
+        overlay_font = ImageFont.truetype(
+            font_path(context['overlay_font_family']),
+            context['overlay_font_size'])
+        draw.multiline_text(
+            (context['overlay_text_x'], context['overlay_text_y']),
+            context['overlay_title'], context['overlay_font_color'],
+            overlay_font)
 
     buffer = io.BytesIO()
     composition.save(buffer, format='PNG')
@@ -59,25 +94,46 @@ def generate_from_url(url, context):
     return generate(original_photo, context)
 
 
-def int_from(name, default):
+def int_from(name, default=0):
     try:
-        return int(request.form[name].strip())
+        return int(request.form.get(name, str(default)).strip())
     except:
         return default
 
 
+def clean_string(name, default=''):
+    return request.form.get(name, default).replace('\r', '')
+
+
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    context = {}
+
+    context = {
+        'white': clean_string('white', WHITE),
+        'black': clean_string('black', BLACK),
+        'url': clean_string('url'),
+        'process_image': bool(request.form.get('process_image')),
+        'font_families': FONTS.items(),
+
+        # Main title
+        'title': clean_string('title'),
+        'font_color': clean_string('font_color', BLACK),
+        'font_family': int_from('font_family', DEFAULT_FONT_ID),
+        'text_x': int_from('text_x', DEFAULT_TEXT_X),
+        'text_y': int_from('text_y', DEFAULT_TEXT_Y),
+        'font_size': int_from('font_size', DEFAULT_FONT_SIZE),
+
+        # Overlay title
+        'overlay_title': clean_string('overlay_title'),
+        'overlay_font_color': clean_string('overlay_font_color', WHITE),
+        'overlay_font_family': int_from(
+            'overlay_font_family', DEFAULT_FONT_ID),
+        'overlay_text_x': int_from('overlay_text_x', DEFAULT_OVERLAY_TEXT_X),
+        'overlay_text_y': int_from('overlay_text_y', DEFAULT_OVERLAY_TEXT_Y),
+        'overlay_font_size': int_from('overlay_font_size', DEFAULT_FONT_SIZE),
+    }
+
     if request.method == 'POST':
-        context['title'] = request.form['title'].replace('\r', '')
-        context['url'] = request.form['url']
-        context['white'] = request.form['white']
-        context['black'] = request.form['black']
-        context['text_x'] = int_from('text_x', DEFAULT_TEXT_X)
-        context['text_y'] = int_from('text_y', DEFAULT_TEXT_Y)
-        context['font_color'] = request.form['font_color']
-        context['font_size'] = int_from('font_size', DEFAULT_FONT_SIZE)
         file = request.files['file']
         try:
             if file.filename:
@@ -88,12 +144,8 @@ def index():
             logging.exception(e)
             context['error'] = 'Não foi possível gerar a imagem'
     else:
-        context['white'] = '#ffffff'
-        context['black'] = '#000000'
-        context['font_color'] = '#000000'
-        context['font_size'] = DEFAULT_FONT_SIZE
-        context['text_x'] = DEFAULT_TEXT_X
-        context['text_y'] = DEFAULT_TEXT_Y
+        context['process_image'] = True
+
     return render_template('application.html', **context)
 
 
