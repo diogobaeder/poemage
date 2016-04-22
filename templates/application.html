@@ -18,12 +18,12 @@
                 <dt><label for="title">Escreva um título curto</label></dt>
                 <dd><textarea name="title" id="title" rows="3" cols="50">{{ title }}</textarea></dd>
                 <dt><label for="font_size">Tamanho da fonte</label></dt>
-                <dd><input type="text" name="font_size" id="font_size" value="{{ font_size }}" /></dd>
+                <dd><input type="number" inputmode="numeric" name="font_size" id="font_size" value="{{ font_size }}" /></dd>
                 <dt><label for="font_color">Cor da fonte</label></dt>
                 <dd><input type="color" id="font_color" name="font_color" value="{{ font_color }}" /></dd>
                 <dt><label for="text_position">Posicionamento do texto</label></dt>
-                <dd>X: <input type="text" id="text_x" name="text_x" value="{{ text_x }}" /></dd>
-                <dd>Y: <input type="text" id="text_y" name="text_y" value="{{ text_y }}" /></dd>
+                <dd>X: <input type="number" inputmode="numeric" id="text_x" name="text_x" value="{{ text_x }}" /></dd>
+                <dd>Y: <input type="number" inputmode="numeric" id="text_y" name="text_y" value="{{ text_y }}" /></dd>
             </dl>
             <button type="submit">Gerar!</button>
         </form>
