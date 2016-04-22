@@ -49,15 +49,29 @@ def generate(original_photo, context):
     mask = mask.convert('RGBA')
     photo = photo.convert('RGBA')
 
+    photo = process_image(context, photo)
+
+    composition = Image.alpha_composite(photo, mask)
+
+    draw_text(composition, context)
+
+    buffer = io.BytesIO()
+    composition.save(buffer, format='PNG')
+    image_bytes = base64.b64encode(buffer.getvalue())
+
+    return image_bytes.decode('ascii')
+
+
+def process_image(context, photo):
     if context['process_image']:
         photo = photo.convert('L')
         photo = ImageOps.equalize(photo)
         photo = ImageOps.colorize(photo, context['black'], context['white'])
         photo = photo.convert('RGBA')
+    return photo
 
-    composition = Image.alpha_composite(photo, mask)
 
-
+def draw_text(composition, context):
     draw = ImageDraw.Draw(composition)
 
     main_font = ImageFont.truetype(
@@ -66,20 +80,13 @@ def generate(original_photo, context):
         (context['text_x'], context['text_y']),
         context['title'], context['font_color'], main_font)
 
-    if context['overlay_title']:
-        overlay_font = ImageFont.truetype(
-            font_path(context['overlay_font_family']),
-            context['overlay_font_size'])
-        draw.multiline_text(
-            (context['overlay_text_x'], context['overlay_text_y']),
-            context['overlay_title'], context['overlay_font_color'],
-            overlay_font)
-
-    buffer = io.BytesIO()
-    composition.save(buffer, format='PNG')
-    image_bytes = base64.b64encode(buffer.getvalue())
-
-    return image_bytes.decode('ascii')
+    overlay_font = ImageFont.truetype(
+        font_path(context['overlay_font_family']),
+        context['overlay_font_size'])
+    draw.multiline_text(
+        (context['overlay_text_x'], context['overlay_text_y']),
+        context['overlay_title'], context['overlay_font_color'],
+        overlay_font)
 
 
 def generate_from_file(file, context):
