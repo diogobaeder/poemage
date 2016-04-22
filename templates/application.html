@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/spectrum.css') }}" />
         <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/spectrum.js') }}"></script>
     </head>
     <body>
         <h1>Gerador de imagens para o POEMA</h1>
         <form action="/" method="POST" enctype="multipart/form-data">
             <dl>
                 <dt><label for="white">Cor clara</label></dt>
-                <dd><input type="text" id="white" name="white" value="{{ white }}" class="colorpicker" /></dd>
-                <dt><label for="white">Cor escura</label></dt>
-                <dd><input type="text" id="black" name="black" value="{{ black }}" class="colorpicker" /></dd>
+                <dd><input type="color" id="white" name="white" value="{{ white }}" /></dd>
+                <dt><label for="black">Cor escura</label></dt>
+                <dd><input type="color" id="black" name="black" value="{{ black }}" /></dd>
                 <dt><label for="file">Selecione o arquivo...</label></dt>
                 <dd><input type="file" name="file" id="file" /></dd>
                 <dt><label for="url">... ou cole uma URL</label></dt>
                 <dd><input type="text" name="url" id="url" value="{{ url }}" /></dd>
                 <dt><label for="title">Escreva um título curto</label></dt>
                 <dd><textarea name="title" id="title" rows="3" cols="50">{{ title }}</textarea></dd>
-                <dt><label for="size">Tamanho da fonte</label></dt>
-                <dd><input type="text" name="size" id="size" value="{{ size }}" /></dd>
+                <dt><label for="font_size">Tamanho da fonte</label></dt>
+                <dd><input type="text" name="font_size" id="font_size" value="{{ font_size }}" /></dd>
+                <dt><label for="font_color">Cor da fonte</label></dt>
+                <dd><input type="color" id="font_color" name="font_color" value="{{ font_color }}" /></dd>
+                <dt><label for="text_position">Posicionamento do texto</label></dt>
+                <dd>X: <input type="text" id="text_x" name="text_x" value="{{ text_x }}" /></dd>
+                <dd>Y: <input type="text" id="text_y" name="text_y" value="{{ text_y }}" /></dd>
             </dl>
             <button type="submit">Gerar!</button>
         </form>
@@ -31,12 +34,5 @@
         <p style="color: green">Imagem gerada com sucesso:</p>
         <div><img src="data:image/png;base64,{{ image }}" /></div>
         {% endif %}
-        <script>
-        $(document).ready(function(){
-            $(".colorpicker").spectrum({
-                preferredFormat: "hex"
-            });
-        });
-        </script>
     </body>
 </html>

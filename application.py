@@ -17,11 +17,9 @@ app = Flask(__name__)
 
 MASK = join(app.root_path, 'static', 'img', 'mask.png')
 FONTS = join(app.root_path, 'static', 'fonts')
-#UPLOADS = join(app.root_path, 'uploads')
-
-
-#if not exists(UPLOADS):
-    #os.mkdir(UPLOADS)
+DEFAULT_FONT_SIZE = 36
+DEFAULT_TEXT_X = 250
+DEFAULT_TEXT_Y = 530
 
 
 def generate(original_photo, context):
@@ -36,11 +34,11 @@ def generate(original_photo, context):
     composition = Image.alpha_composite(photo, mask)
 
     font_path = join(FONTS, 'SourceSansPro-Bold.ttf')
-    text_coords = (250, 530)
-    text_color = (0, 0, 0, 255)
-    font = ImageFont.truetype(font_path, context['size'])
+    text_coords = (context['text_x'], context['text_y'])
+    font = ImageFont.truetype(font_path, context['font_size'])
     draw = ImageDraw.Draw(composition)
-    draw.multiline_text(text_coords, context['title'], text_color, font)
+    draw.multiline_text(
+        text_coords, context['title'], context['font_color'], font)
 
     buffer = io.BytesIO()
     composition.save(buffer, format='PNG')
@@ -61,19 +59,25 @@ def generate_from_url(url, context):
     return generate(original_photo, context)
 
 
+def int_from(name, default):
+    try:
+        return int(request.form[name].strip())
+    except:
+        return default
+
+
 @app.route('/', methods=['POST', 'GET'])
 def index():
     context = {}
     if request.method == 'POST':
-        try:
-            size = int(request.form['size'].strip())
-        except:
-            size = 20
         context['title'] = request.form['title'].replace('\r', '')
         context['url'] = request.form['url']
         context['white'] = request.form['white']
         context['black'] = request.form['black']
-        context['size'] = size
+        context['text_x'] = int_from('text_x', DEFAULT_TEXT_X)
+        context['text_y'] = int_from('text_y', DEFAULT_TEXT_Y)
+        context['font_color'] = request.form['font_color']
+        context['font_size'] = int_from('font_size', DEFAULT_FONT_SIZE)
         file = request.files['file']
         try:
             if file.filename:
@@ -86,7 +90,10 @@ def index():
     else:
         context['white'] = '#ffffff'
         context['black'] = '#000000'
-        context['size'] = 20
+        context['font_color'] = '#000000'
+        context['font_size'] = DEFAULT_FONT_SIZE
+        context['text_x'] = DEFAULT_TEXT_X
+        context['text_y'] = DEFAULT_TEXT_Y
     return render_template('application.html', **context)
 
 
