@@ -1,11 +1,13 @@
 import base64
-import logging
+import hashlib
 import io
+import logging
 import os
 import urllib.request
 from os.path import exists, join
+from uuid import uuid4
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 
@@ -15,8 +17,9 @@ logging.basicConfig()
 app = Flask(__name__)
 
 
-MASK = join(app.root_path, 'static', 'img', 'mask.png')
-FONTS_PATH = join(app.root_path, 'static', 'fonts')
+STATIC = join(app.root_path, 'static')
+MASK = join(STATIC, 'img', 'mask.png')
+FONTS_PATH = join(STATIC, 'fonts')
 WHITE = '#ffffff'
 BLACK = '#000000'
 DEFAULT_FONT_SIZE = 36
@@ -36,6 +39,33 @@ FONTS_IDS = {
 }
 DEFAULT_FONT = 'Impact.ttf'
 DEFAULT_FONT_ID = FONTS_IDS[DEFAULT_FONT]
+
+
+STATIC_HASHES = {}
+
+
+def new_hash_for(path):
+    file_path = join(STATIC, path)
+
+    try:
+        with open(file_path, 'rb') as f:
+            m = hashlib.md5()
+            m.update(f.read())
+            hash_ = m.hexdigest()
+    except:
+        hash_ = uuid4()
+
+    url = '{}?_={}'.format(url_for('static', filename=path), hash_)
+    STATIC_HASHES[path] = url
+
+    return url
+
+
+def hashed_static(path):
+    if path in STATIC_HASHES:
+        return STATIC_HASHES[path]
+
+    return new_hash_for(path)
 
 
 def font_path(font_id):
@@ -163,6 +193,9 @@ def index():
         context['process_image'] = True
 
     return render_template('application.html', **context)
+
+
+app.jinja_env.globals['hashed_static'] = hashed_static
 
 
 if __name__ == '__main__':
