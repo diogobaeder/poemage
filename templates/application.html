@@ -1,38 +1,132 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-    </head>
-    <body>
-        <h1>Gerador de imagens para o POEMA</h1>
-        <form action="" method="POST" enctype="multipart/form-data">
-            <dl>
-                <dt><label for="white">Cor clara</label></dt>
-                <dd><input type="color" id="white" name="white" value="{{ white }}" /></dd>
-                <dt><label for="black">Cor escura</label></dt>
-                <dd><input type="color" id="black" name="black" value="{{ black }}" /></dd>
-                <dt><label for="file">Selecione o arquivo...</label></dt>
-                <dd><input type="file" name="file" id="file" /></dd>
-                <dt><label for="url">... ou cole uma URL</label></dt>
-                <dd><input type="text" name="url" id="url" value="{{ url }}" /></dd>
-                <dt><label for="title">Escreva um título curto</label></dt>
-                <dd><textarea name="title" id="title" rows="3" cols="50">{{ title }}</textarea></dd>
-                <dt><label for="font_size">Tamanho da fonte</label></dt>
-                <dd><input type="number" inputmode="numeric" name="font_size" id="font_size" value="{{ font_size }}" /></dd>
-                <dt><label for="font_color">Cor da fonte</label></dt>
-                <dd><input type="color" id="font_color" name="font_color" value="{{ font_color }}" /></dd>
-                <dt><label for="text_position">Posicionamento do texto</label></dt>
-                <dd>X: <input type="number" inputmode="numeric" id="text_x" name="text_x" value="{{ text_x }}" /></dd>
-                <dd>Y: <input type="number" inputmode="numeric" id="text_y" name="text_y" value="{{ text_y }}" /></dd>
-            </dl>
-            <button type="submit">Gerar!</button>
-        </form>
-        {% if error %}
-        <p style="color: red">{{ error }}</p>
-        {% endif %}
-        {% if image %}
-        <p style="color: green">Imagem gerada com sucesso:</p>
-        <div><img src="data:image/png;base64,{{ image }}" /></div>
-        {% endif %}
-    </body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Gerador de posts | POEMA</title>
+
+    <!-- Bootstrap -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/poema.css') }}" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+
+      <header>
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">Gerador de posts</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="#">Topo</a></li>
+                <li><a href="#image-fieldset">Imagem</a></li>
+                <li><a href="#image-text-fieldset">Texto da imagem</a></li>
+                <li><a href="#result">Resultado</a></li>
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div>
+        </nav>
+      </header>
+
+      <div class="jumbotron">
+        <h1>Gerador de posts</h1>
+        <p>Gera imagem e texto para posts no Facebook</p>
+      </div>
+
+
+
+        <section class="form">
+          <form action="" method="POST" enctype="multipart/form-data">
+            <fieldset id="image-fieldset">
+              <legend>Imagem</legend>
+              <div class="col-md-4">
+                <label for="file">Selecione o arquivo para imagem de fundo...</label>
+                <input type="file" name="file" id="file" />
+              </div>
+              <div class="col-md-4">
+                <label for="url">... ou cole uma URL</label>
+                <input type="text" name="url" id="url" value="{{ url }}" />
+              </div>
+              <div class="col-md-4">
+                <p>Colorização</p>
+                <label for="white">Cor clara</label>
+                <input type="color" id="white" name="white" value="{{ white }}" />
+                <label for="black">Cor escura</label>
+                <input type="color" id="black" name="black" value="{{ black }}" />
+              </div>
+            </fieldset>
+            <fieldset id="image-text-fieldset">
+              <legend>Texto da imagem</legend>
+              <div class="col-md-6">
+                <p>Título</p>
+                <textarea name="title" id="title" rows="3" cols="50">{{ title }}</textarea>
+                <div>
+                  <label for="font_size">Tamanho da fonte</label>
+                  <input type="number" inputmode="numeric" name="font_size" id="font_size" value="{{ font_size }}" />
+                </div>
+                <div>
+                  <label for="font_color">Cor da fonte</label>
+                  <input type="color" id="font_color" name="font_color" value="{{ font_color }}" />
+                </div>
+                <div>
+                  <p>Posicionamento do texto</p>
+                  <label for="text_x">X</label>
+                  <input type="number" inputmode="numeric" id="text_x" name="text_x" value="{{ text_x }}" />
+                  <label for="text_y">Y</label>
+                  <input type="number" inputmode="numeric" id="text_y" name="text_y" value="{{ text_y }}" />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <p>Overlay</p>
+                <textarea name="overlay_title" id="overlay_title" rows="3" cols="50">{{ overlay_title }}</textarea>
+                <div>
+                  <label for="overlay_font_size">Tamanho da fonte</label>
+                  <input type="number" inputmode="numeric" name="overlay_font_size" id="overlay_font_size" value="{{ overlay_font_size }}" />
+                </div>
+                <div>
+                  <label for="overlay_font_color">Cor da fonte</label>
+                  <input type="color" id="overlay_font_color" name="overlay_font_color" value="{{ overlay_font_color }}" />
+                </div>
+                <div>
+                  <p>Posicionamento do texto</p>
+                  <label for="overlay_text_x">X</label>
+                  <input type="number" inputmode="numeric" id="overlay_text_x" name="overlay_text_x" value="{{ overlay_text_x }}" />
+                  <label for="overlay_text_y">Y</label>
+                  <input type="number" inputmode="numeric" id="overlay_text_y" name="overlay_text_y" value="{{ overlay_text_y }}" />
+                </div>
+              </div>
+              <div class="col-md-12 submit">
+                <button type="submit">Gerar!</button>
+              </div>
+            </fieldset>
+          </form>
+        </section>
+        <section class="result">
+          <h3 id="result">Resultado</h3>
+          {% if error %}
+          <div class="alert alert-danger" role="alert">{{ error }}</div>
+          {% endif %}
+          {% if image %}
+          <div class="alert alert-success" role="alert">Imagem gerada com sucesso!</div>
+          <div><img src="data:image/png;base64,{{ image }}" /></div>
+          {% endif %}
+        </section>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  </body>
 </html>
