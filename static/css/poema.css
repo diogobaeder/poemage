@@ -1,3 +1,18 @@
 div.submit {
-    margin-top: 1em;
+    margin: 1em 0;
+}
+
+#post-text-fieldset label {
+    width: 7em;
+}
+
+#image-text-fieldset label.adjusted {
+    width: 10em;
+}
+
+.post-text {
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    padding: 1em;
+    margin: 1em 0;
 }

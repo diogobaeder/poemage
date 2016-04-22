@@ -112,9 +112,7 @@ def clean_string(name, default=''):
     return request.form.get(name, default).replace('\r', '')
 
 
-@app.route('/', methods=['POST', 'GET'])
-def index():
-
+def create_context():
     context = {
         'white': clean_string('white', WHITE),
         'black': clean_string('black', BLACK),
@@ -138,7 +136,18 @@ def index():
         'overlay_text_x': int_from('overlay_text_x', DEFAULT_OVERLAY_TEXT_X),
         'overlay_text_y': int_from('overlay_text_y', DEFAULT_OVERLAY_TEXT_Y),
         'overlay_font_size': int_from('overlay_font_size', DEFAULT_FONT_SIZE),
+
+        # Post text
+        'post_title': clean_string('post_title'),
+        'post_message': clean_string('post_message'),
     }
+    return context
+
+
+@app.route('/', methods=['POST', 'GET'])
+def index():
+
+    context = create_context()
 
     if request.method == 'POST':
         file = request.files['file']
