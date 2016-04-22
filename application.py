@@ -27,7 +27,7 @@ def generate(original_photo, context):
     photo = ImageOps.fit(original_photo, mask.size)
     mask = mask.convert('RGBA')
     photo = photo.convert('L')
-    photo = ImageOps.equalize(photo)
+    #photo = ImageOps.equalize(photo)
     photo = ImageOps.colorize(photo, context['black'], context['white'])
     photo = photo.convert('RGBA')
 
