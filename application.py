@@ -37,7 +37,7 @@ FONTS = {
 FONTS_IDS = {
     font: i for i, font in FONTS.items()
 }
-DEFAULT_FONT = 'Impact.ttf'
+DEFAULT_FONT = 'SourceSansPro-Bold.ttf'
 DEFAULT_FONT_ID = FONTS_IDS[DEFAULT_FONT]
 
 
