@@ -3,6 +3,7 @@ import hashlib
 import io
 import json
 import logging
+import tempfile
 import os
 import urllib.request
 from collections import OrderedDict
@@ -51,6 +52,10 @@ STATIC_HASHES = {}
 class Credentials:
     def __init__(self, service):
         self.service = service
+
+    @classmethod
+    def for_imgur(cls):
+        return cls('imgur')
 
     def credentials_folder(self):
         path = join(dirname(__file__), 'credentials')
@@ -149,8 +154,27 @@ def draw_text(composition, context):
         overlay_font)
 
 
+def link_for_original(original_photo):
+    credentials = Credentials.for_imgur()
+    data = credentials.data
+    client = ImgurClient(
+        data['client_id'], data['client_secret'],
+        data['access_token'], data['refresh_token'],
+    )
+    with tempfile.NamedTemporaryFile() as f:
+        original_photo.save(f, format='PNG')
+        response = client.upload_from_path(f.name)
+
+    return response['link']
+
+
 def generate_from_file(file, context):
     original_photo = Image.open(file.stream)
+    try:
+        link = link_for_original(original_photo)
+        context['url'] = link
+    except Exception as e:
+        logging.exception(e)
     return generate(original_photo, context)
 
 
@@ -237,7 +261,7 @@ def imgur():
     for field in fields:
         context[field] = request.form.get(field, '')
 
-    creds = Credentials('imgur')
+    creds = Credentials.for_imgur()
 
     if request.method == 'POST':
         client_id = context['client_id']
