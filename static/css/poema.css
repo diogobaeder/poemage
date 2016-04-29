@@ -1,3 +1,7 @@
+.header-spacing {
+    margin-top: 60px;
+}
+
 div.submit {
     margin: 1em 0;
 }
@@ -6,7 +10,7 @@ div.submit {
     width: 7em;
 }
 
-#image-text-fieldset label.adjusted {
+label.adjusted {
     width: 10em;
 }
 

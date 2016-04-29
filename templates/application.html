@@ -1,174 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Gerador de posts | POEMA</title>
+{% extends 'base.html' %}
 
-    <!-- Bootstrap -->
-    <link href="{{ hashed_static('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ hashed_static('css/poema.css') }}" rel="stylesheet">
-  </head>
-  <body>
-    <div class="container">
+{% block content %}
 
-      <header>
-        <!-- Fixed navbar -->
-        <nav class="navbar navbar-default navbar-fixed-top">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="#">Gerador de posts</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <li><a href="#">Topo</a></li>
-                <li><a href="#image-fieldset">Imagem</a></li>
-                <li><a href="#image-text-fieldset">Texto da imagem</a></li>
-                <li><a href="#post-text-fieldset">Texto do post</a></li>
-                <li><a href="#result">Resultado</a></li>
-              </ul>
-            </div><!--/.nav-collapse -->
-          </div>
-        </nav>
-      </header>
+<div class="jumbotron">
+  <h1>Gerador de posts</h1>
+  <p>Gera imagem e texto para posts no Facebook</p>
+</div>
 
-      <div class="jumbotron">
-        <h1>Gerador de posts</h1>
-        <p>Gera imagem e texto para posts no Facebook</p>
+
+
+<section class="form">
+  <form action="" method="POST" enctype="multipart/form-data">
+    <fieldset id="image-fieldset">
+      <legend>Imagem</legend>
+      <div class="col-md-12">
+      <input type="checkbox" id="process_image" name="process_image" {% if process_image %}checked{% endif %}>
+        <label for="process_image">Processar imagem?</label>
       </div>
-
-
-
-        <section class="form">
-          <form action="" method="POST" enctype="multipart/form-data">
-            <fieldset id="image-fieldset">
-              <legend>Imagem</legend>
-              <div class="col-md-12">
-              <input type="checkbox" id="process_image" name="process_image" {% if process_image %}checked{% endif %}>
-                <label for="process_image">Processar imagem?</label>
-              </div>
-              <div class="col-md-4">
-                <label for="file">Selecione o arquivo para imagem de fundo...</label>
-                <input type="file" name="file" id="file" />
-              </div>
-              <div class="col-md-4">
-                <label for="url">... ou cole uma URL</label>
-                <input type="text" name="url" id="url" value="{{ url }}" />
-              </div>
-              <div class="col-md-4">
-                <p>Colorização</p>
-                <label for="white">Cor clara</label>
-                <input type="color" id="white" name="white" value="{{ white }}" />
-                <label for="black">Cor escura</label>
-                <input type="color" id="black" name="black" value="{{ black }}" />
-              </div>
-            </fieldset>
-            <fieldset id="image-text-fieldset">
-              <legend>Texto da imagem</legend>
-              <div class="col-md-6">
-                <p>Título</p>
-                <textarea name="title" id="title" rows="3" cols="50">{{ title }}</textarea>
-                <div>
-                  <label for="font_family" class="adjusted">Família da fonte</label>
-                  <select id="font_family" name="font_family">
-                  {% for i, font in font_families %}
-                    <option value="{{ i }}" {% if i == font_family %}selected{% endif %}>{{ font }}</option>
-                  {% endfor %}
-                  </select>
-                </div>
-                <div>
-                  <label for="font_size" class="adjusted">Tamanho da fonte</label>
-                  <input type="number" inputmode="numeric" name="font_size" id="font_size" value="{{ font_size }}" />
-                </div>
-                <div>
-                  <label for="font_color" class="adjusted">Cor da fonte</label>
-                  <input type="color" id="font_color" name="font_color" value="{{ font_color }}" />
-                </div>
-                <div>
-                  <p>Posicionamento do texto</p>
-                  <label for="text_x">X</label>
-                  <input type="number" inputmode="numeric" id="text_x" name="text_x" value="{{ text_x }}" />
-                  <label for="text_y">Y</label>
-                  <input type="number" inputmode="numeric" id="text_y" name="text_y" value="{{ text_y }}" />
-                </div>
-              </div>
-              <div class="col-md-6">
-                <p>Overlay</p>
-                <textarea name="overlay_title" id="overlay_title" rows="3" cols="50">{{ overlay_title }}</textarea>
-                <div>
-                  <label for="overlay_font_family" class="adjusted">Família da fonte</label>
-                  <select id="overlay_font_family" name="overlay_font_family">
-                  {% for i, font in font_families %}
-                    <option value="{{ i }}" {% if i == overlay_font_family %}selected{% endif %}>{{ font }}</option>
-                  {% endfor %}
-                  </select>
-                </div>
-                <div>
-                  <label for="overlay_font_size" class="adjusted">Tamanho da fonte</label>
-                  <input type="number" inputmode="numeric" name="overlay_font_size" id="overlay_font_size" value="{{ overlay_font_size }}" />
-                </div>
-                <div>
-                  <label for="overlay_font_color" class="adjusted">Cor da fonte</label>
-                  <input type="color" id="overlay_font_color" name="overlay_font_color" value="{{ overlay_font_color }}" />
-                </div>
-                <div>
-                  <p>Posicionamento do texto</p>
-                  <label for="overlay_text_x">X</label>
-                  <input type="number" inputmode="numeric" id="overlay_text_x" name="overlay_text_x" value="{{ overlay_text_x }}" />
-                  <label for="overlay_text_y">Y</label>
-                  <input type="number" inputmode="numeric" id="overlay_text_y" name="overlay_text_y" value="{{ overlay_text_y }}" />
-                </div>
-              </div>
-            </fieldset>
-            <fieldset id="post-text-fieldset">
-              <legend>Texto do post</legend>
-              <div>
-                <label for="post_title">Título</label>
-                <input type="text" name="post_title" value="{{ post_title }}" />
-              </div>
-              <div>
-                <label for="post_message">Mensagem</label>
-                <textarea name="post_message" id="post_message" rows="10" cols="100">{{ post_message }}</textarea>
-              </div>
-            </fieldset>
-            <div class="col-md-12 submit">
-              <button type="submit">Gerar!</button>
-            </div>
-            <br class="clearfix" />
-          </form>
-        </section>
-        <section class="result">
-          <h3 id="result">Resultado</h3>
-          {% if error %}
-          <div class="alert alert-danger" role="alert">{{ error }}</div>
-          {% endif %}
-          {% if image %}
-          <div class="alert alert-success" role="alert">Post gerado com sucesso!</div>
-          <div class="post-text">
-            <p>◥ {{ post_title }}</p>
-            {% for paragraph in post_message.split('\n') %}
-            <p>{{ paragraph }}</p>
-            {% endfor %}
-            <p>◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥</p>
-            <p>POEMA - POLÍTICA ECONÔMICA DA MAIORIA</p>
-            <p>Para mais informações: www.poema.info</p>
-          </div>
-          <div><img src="data:image/png;base64,{{ image }}" /></div>
-          {% endif %}
-        </section>
+      <div class="col-md-4">
+        <label for="file">Selecione o arquivo para imagem de fundo...</label>
+        <input type="file" name="file" id="file" />
+      </div>
+      <div class="col-md-4">
+        <label for="url">... ou cole uma URL</label>
+        <input type="text" name="url" id="url" value="{{ url }}" />
+      </div>
+      <div class="col-md-4">
+        <p>Colorização</p>
+        <label for="white">Cor clara</label>
+        <input type="color" id="white" name="white" value="{{ white }}" />
+        <label for="black">Cor escura</label>
+        <input type="color" id="black" name="black" value="{{ black }}" />
+      </div>
+    </fieldset>
+    <fieldset id="image-text-fieldset">
+      <legend>Texto da imagem</legend>
+      <div class="col-md-6">
+        <p>Título</p>
+        <textarea name="title" id="title" rows="3" cols="50">{{ title }}</textarea>
+        <div>
+          <label for="font_family" class="adjusted">Família da fonte</label>
+          <select id="font_family" name="font_family">
+          {% for i, font in font_families %}
+            <option value="{{ i }}" {% if i == font_family %}selected{% endif %}>{{ font }}</option>
+          {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="font_size" class="adjusted">Tamanho da fonte</label>
+          <input type="number" inputmode="numeric" name="font_size" id="font_size" value="{{ font_size }}" />
+        </div>
+        <div>
+          <label for="font_color" class="adjusted">Cor da fonte</label>
+          <input type="color" id="font_color" name="font_color" value="{{ font_color }}" />
+        </div>
+        <div>
+          <p>Posicionamento do texto</p>
+          <label for="text_x">X</label>
+          <input type="number" inputmode="numeric" id="text_x" name="text_x" value="{{ text_x }}" />
+          <label for="text_y">Y</label>
+          <input type="number" inputmode="numeric" id="text_y" name="text_y" value="{{ text_y }}" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <p>Overlay</p>
+        <textarea name="overlay_title" id="overlay_title" rows="3" cols="50">{{ overlay_title }}</textarea>
+        <div>
+          <label for="overlay_font_family" class="adjusted">Família da fonte</label>
+          <select id="overlay_font_family" name="overlay_font_family">
+          {% for i, font in font_families %}
+            <option value="{{ i }}" {% if i == overlay_font_family %}selected{% endif %}>{{ font }}</option>
+          {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="overlay_font_size" class="adjusted">Tamanho da fonte</label>
+          <input type="number" inputmode="numeric" name="overlay_font_size" id="overlay_font_size" value="{{ overlay_font_size }}" />
+        </div>
+        <div>
+          <label for="overlay_font_color" class="adjusted">Cor da fonte</label>
+          <input type="color" id="overlay_font_color" name="overlay_font_color" value="{{ overlay_font_color }}" />
+        </div>
+        <div>
+          <p>Posicionamento do texto</p>
+          <label for="overlay_text_x">X</label>
+          <input type="number" inputmode="numeric" id="overlay_text_x" name="overlay_text_x" value="{{ overlay_text_x }}" />
+          <label for="overlay_text_y">Y</label>
+          <input type="number" inputmode="numeric" id="overlay_text_y" name="overlay_text_y" value="{{ overlay_text_y }}" />
+        </div>
+      </div>
+    </fieldset>
+    <fieldset id="post-text-fieldset">
+      <legend>Texto do post</legend>
+      <div>
+        <label for="post_title">Título</label>
+        <input type="text" name="post_title" value="{{ post_title }}" />
+      </div>
+      <div>
+        <label for="post_message">Mensagem</label>
+        <textarea name="post_message" id="post_message" rows="10" cols="100">{{ post_message }}</textarea>
+      </div>
+    </fieldset>
+    <div class="col-md-12 submit">
+      <button type="submit">Gerar!</button>
     </div>
+    <br class="clearfix" />
+  </form>
+</section>
+<section class="result">
+  <h3 id="result">Resultado</h3>
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+  {% if image %}
+  <div class="alert alert-success" role="alert">Post gerado com sucesso!</div>
+  <div class="post-text">
+    <p>◥ {{ post_title }}</p>
+    {% for paragraph in post_message.split('\n') %}
+    <p>{{ paragraph }}</p>
+    {% endfor %}
+    <p>◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥◥</p>
+    <p>POEMA - POLÍTICA ECONÔMICA DA MAIORIA</p>
+    <p>Para mais informações: www.poema.info</p>
+  </div>
+  <div><img src="data:image/png;base64,{{ image }}" /></div>
+  {% endif %}
+</section>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="{{ hashed_static('js/jquery.js') }}"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{{ hashed_static('js/bootstrap.min.js') }}"></script>
-  </body>
-</html>
+{% endblock %}

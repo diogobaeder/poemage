@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="form">
+  <form action="" method="POST" enctype="multipart/form-data">
+    <fieldset>
+      <legend>Credenciais</legend>
+      {% for field, value in context.items() %}
+      <div class="col-md-12">
+        <label for="{{ field }}" class="adjusted">{{ field }}</label>
+        <input type="text" name="{{ field }}" id="{{ field }}" value="{{ value }}" />
+      </div>
+      {% endfor %}
+    </fieldset>
+    <div class="col-md-12 submit">
+      <button type="submit">Gerar!</button>
+    </div>
+    <br class="clearfix" />
+  </form>
+</section>
+{% endblock %}

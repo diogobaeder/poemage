@@ -1,13 +1,17 @@
 import base64
 import hashlib
 import io
+import json
 import logging
 import os
 import urllib.request
-from os.path import exists, join
+from collections import OrderedDict
+from contextlib import contextmanager
+from os.path import dirname, exists, join
 from uuid import uuid4
 
-from flask import Flask, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for
+from imgurpython import ImgurClient
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 
@@ -42,6 +46,32 @@ DEFAULT_FONT_ID = FONTS_IDS[DEFAULT_FONT]
 
 
 STATIC_HASHES = {}
+
+
+class Credentials:
+    def __init__(self, service):
+        self.service = service
+
+    def credentials_folder(self):
+        path = join(dirname(__file__), 'credentials')
+        os.makedirs(path, exist_ok=True)
+
+        return path
+
+    def credentials_file(self):
+        return join(self.credentials_folder(), '{}.json'.format(self.service))
+
+    @property
+    def data(self):
+        with open(self.credentials_file()) as f:
+            data = json.load(f)
+
+        return data
+
+    @data.setter
+    def data(self, data):
+        with open(self.credentials_file(), 'w') as f:
+            json.dump(data, f)
 
 
 def new_hash_for(path):
@@ -193,6 +223,46 @@ def index():
         context['process_image'] = True
 
     return render_template('application.html', **context)
+
+
+@app.route('/imgur', methods=['POST', 'GET'])
+def imgur():
+    fields = (
+        'client_id',
+        'client_secret',
+        'access_token',
+        'refresh_token',
+    )
+    context = OrderedDict()
+    for field in fields:
+        context[field] = request.form.get(field, '')
+
+    creds = Credentials('imgur')
+
+    if request.method == 'POST':
+        client_id = context['client_id']
+        client_secret = context['client_secret']
+        creds.data = context
+        if client_id and client_secret:
+            client = ImgurClient(client_id, client_secret)
+            authorization_url = client.get_auth_url('code')
+            return redirect(authorization_url)
+    elif 'code' in request.args:
+        data = creds.data
+        client_id = data['client_id']
+        client_secret = data['client_secret']
+        client = ImgurClient(client_id, client_secret)
+        code = request.args['code']
+
+        credentials = client.authorize(code, 'authorization_code')
+        client.set_user_auth(
+            credentials['access_token'], credentials['refresh_token'])
+        data.update(credentials)
+        context.update(data)
+        creds.data = data
+
+    return render_template(
+        'imgur.html', context=context, **context)
 
 
 app.jinja_env.globals['hashed_static'] = hashed_static
