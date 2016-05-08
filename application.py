@@ -128,11 +128,13 @@ def generate(original_photo, context):
 
 
 def process_image(context, photo):
-    if context['process_image']:
+    if context['colorize'] or context['equalize']:
         photo = photo.convert('L')
+    if context['equalize']:
         photo = ImageOps.equalize(photo)
+    if context['colorize']:
         photo = ImageOps.colorize(photo, context['black'], context['white'])
-        photo = photo.convert('RGBA')
+    photo = photo.convert('RGBA')
     return photo
 
 
@@ -201,7 +203,8 @@ def create_context():
         'white': clean_string('white', WHITE),
         'black': clean_string('black', BLACK),
         'url': clean_string('url'),
-        'process_image': bool(request.form.get('process_image')),
+        'equalize': bool(request.form.get('equalize')),
+        'colorize': bool(request.form.get('colorize')),
         'font_families': FONTS.items(),
 
         # Main title
@@ -244,7 +247,8 @@ def index():
             logging.exception(e)
             context['error'] = 'Não foi possível gerar a imagem'
     else:
-        context['process_image'] = True
+        context['equalize'] = True
+        context['colorize'] = True
 
     return render_template('application.html', **context)
 

@@ -13,10 +13,6 @@
   <form action="" method="POST" enctype="multipart/form-data">
     <fieldset id="image-fieldset">
       <legend>Imagem</legend>
-      <div class="col-md-12">
-      <input type="checkbox" id="process_image" name="process_image" {% if process_image %}checked{% endif %}>
-        <label for="process_image">Processar imagem?</label>
-      </div>
       <div class="col-md-4">
         <label for="file">Selecione o arquivo para imagem de fundo...</label>
         <input type="file" name="file" id="file" />
@@ -24,6 +20,17 @@
       <div class="col-md-4">
         <label for="url">... ou cole uma URL</label>
         <input type="text" name="url" id="url" value="{{ url }}" />
+      </div>
+    </fieldset>
+    <fieldset id="image-processing">
+      <legend>Tratamento</legend>
+      <div class="col-md-4">
+        <input type="checkbox" id="equalize" name="equalize" {% if equalize %}checked{% endif %}>
+        <label for="equalize">Equalizar imagem pelo histograma?</label>
+      </div>
+      <div class="col-md-4">
+        <input type="checkbox" id="colorize" name="colorize" {% if colorize %}checked{% endif %}>
+        <label for="colorize">Colorizar imagem?</label>
       </div>
       <div class="col-md-4">
         <p>Colorização</p>
