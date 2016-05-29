@@ -46,6 +46,27 @@ DEFAULT_FONT = 'SourceSansPro-Bold.ttf'
 DEFAULT_FONT_ID = FONTS_IDS[DEFAULT_FONT]
 
 
+class Mask:
+    def __init__(self, name, filename):
+        self.name = name
+        self.filename = filename
+
+    @property
+    def path(self):
+        return join(STATIC, 'img', 'masks', self.filename)
+
+    def __str__(self):
+        return self.name
+
+
+MASKS = [
+    Mask('Paisagem', 'landscape.png'),
+    Mask('Meme - nome branco', 'meme-white.png'),
+    Mask('Meme - nome cinza', 'meme-gray.png'),
+    Mask('Meme - nome preto', 'meme-black.png'),
+]
+
+
 STATIC_HASHES = {}
 
 
@@ -109,7 +130,9 @@ def font_path(font_id):
 
 
 def generate(original_photo, context):
-    mask = Image.open(MASK)
+    mask_id = context['image_kind']
+    mask = MASKS[mask_id]
+    mask = Image.open(mask.path)
     photo = ImageOps.fit(original_photo, mask.size)
     mask = mask.convert('RGBA')
     photo = photo.convert('RGBA')
@@ -206,6 +229,8 @@ def create_context():
         'equalize': bool(request.form.get('equalize')),
         'colorize': bool(request.form.get('colorize')),
         'font_families': FONTS.items(),
+        'image_kinds': enumerate(MASKS),
+        'image_kind': int_from('image_kind', 0),
 
         # Main title
         'title': clean_string('title'),

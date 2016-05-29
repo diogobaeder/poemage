@@ -21,6 +21,14 @@
         <label for="url">... ou cole uma URL</label>
         <input type="text" name="url" id="url" value="{{ url }}" />
       </div>
+      <div class="col-md-4">
+        <label for="image_kind">Que tipo de imagem?</label>
+        <select id="image_kind" name="image_kind">
+        {% for i, kind in image_kinds %}
+          <option value="{{ i }}" {% if i == image_kind %}selected{% endif %}>{{ kind }}</option>
+        {% endfor %}
+        </select>
+      </div>
     </fieldset>
     <fieldset id="image-processing">
       <legend>Tratamento</legend>
