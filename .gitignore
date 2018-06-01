@@ -65,3 +65,6 @@ target/
 # app
 uploads/
 credentials/
+
+
+.idea/
